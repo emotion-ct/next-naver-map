@@ -6,64 +6,64 @@ function useMap() {
     { latitude: number; longitude: number } | string
   >("");
 
-  let markers: any = [
-    // {
-    //   id: 1111,
-    //   category: "와인샵",
-    //   markerState: true,
-    //   latitude: 37.512521,
-    //   longitude: 127.032595,
-    // },
-    // {
-    //   id: 2222,
-    //   category: "할인샵",
-    //   markerState: true,
-    //   latitude: 37.514812,
-    //   longitude: 127.03261,
-    // },
-    // {
-    //   id: 3333,
-    //   category: "레스토랑",
-    //   markerState: true,
-    //   latitude: 37.513267,
-    //   longitude: 127.036089,
-    // },
-    // {
-    //   id: 4444,
-    //   category: "제휴샵",
-    //   markerState: true,
-    //   latitude: 37.510667,
-    //   longitude: 127.035089,
-    // },
+  let [markers, setMarkers]: any = useState<any>([
     {
-      id: 5555,
+      id: 1111,
       category: "와인샵",
       markerState: true,
-      latitude: 37.526629,
-      longitude: 126.885514,
+      latitude: 37.512521,
+      longitude: 127.032595,
     },
     {
-      id: 6666,
+      id: 2222,
       category: "할인샵",
       markerState: true,
-      latitude: 37.525826,
-      longitude: 126.883592,
+      latitude: 37.514812,
+      longitude: 127.03261,
     },
     {
-      id: 7777,
+      id: 3333,
       category: "레스토랑",
       markerState: true,
-      latitude: 37.525649,
-      longitude: 126.885067,
+      latitude: 37.513267,
+      longitude: 127.036089,
     },
     {
-      id: 8888,
+      id: 4444,
       category: "제휴샵",
       markerState: true,
-      latitude: 37.527416,
-      longitude: 126.884612,
+      latitude: 37.510667,
+      longitude: 127.035089,
     },
-  ];
+    // {
+    //   id: 5555,
+    //   category: "와인샵",
+    //   markerState: true,
+    //   latitude: 37.526629,
+    //   longitude: 126.885514,
+    // },
+    // {
+    //   id: 6666,
+    //   category: "할인샵",
+    //   markerState: true,
+    //   latitude: 37.525826,
+    //   longitude: 126.883592,
+    // },
+    // {
+    //   id: 7777,
+    //   category: "레스토랑",
+    //   markerState: true,
+    //   latitude: 37.525649,
+    //   longitude: 126.885067,
+    // },
+    // {
+    //   id: 8888,
+    //   category: "제휴샵",
+    //   markerState: true,
+    //   latitude: 37.527416,
+    //   longitude: 126.884612,
+    // },
+  ]);
 
   // geolocation 이용 현재 위치 확인, 위치 미동의 시 기본 위치로 지정
   useEffect(() => {
@@ -132,8 +132,8 @@ function useMap() {
           "click",
           function (e) {
             mapRef.current.morph(
-              new naver.maps.LatLng(currentPosition[0], currentPosition[1]),
-              16
+              new naver.maps.LatLng(currentPosition[0], currentPosition[1])
+              // 16
             );
           }
         );
@@ -214,15 +214,22 @@ function useMap() {
 
       // 마커 갯수 테스트용
       // const bounds = mapRef.current.getBounds(),
+      //   markersLength = 500,
       //   southWest = bounds.getSW(),
       //   northEast = bounds.getNE(),
       //   lngSpan = northEast.lng() - southWest.lng(),
       //   latSpan = northEast.lat() - southWest.lat();
       //
-      // const randomPosition = new naver.maps.LatLng(
-      //   southWest.lat() + latSpan * Math.random(),
-      //   southWest.lng() + lngSpan * Math.random()
-      // );
+      // for (let i = 0; i < markersLength; i++) {
+      //   const randomPosition = new naver.maps.LatLng(
+      //     southWest.lat() + latSpan * Math.random(),
+      //     southWest.lng() + lngSpan * Math.random()
+      //   );
+      //   const marker = new naver.maps.Marker({
+      //     position: randomPosition,
+      //     map: mapRef.current,
+      //   });
+      // }
       // 마커 갯수 테스트용
 
       markers = markers.map((item: { latitude: number; longitude: number }) => {
