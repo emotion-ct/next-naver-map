@@ -1,82 +1,46 @@
 import { useEffect, useRef, useState } from "react";
 
-function useMap() {
+function useMap(markers: any) {
   const mapRef = useRef<HTMLElement | null | any>(null);
   const [myLocation, setMyLocation] = useState<
-    { latitude: number; longitude: number } | string
+    { latitude: number; longitude: number; allow: boolean } | string
   >("");
-
-  let [markers, setMarkers]: any = useState<any>([
-    {
-      id: 1111,
-      category: "와인샵",
-      markerState: true,
-      latitude: 37.512521,
-      longitude: 127.032595,
-    },
-    {
-      id: 2222,
-      category: "할인샵",
-      markerState: true,
-      latitude: 37.514812,
-      longitude: 127.03261,
-    },
-    {
-      id: 3333,
-      category: "레스토랑",
-      markerState: true,
-      latitude: 37.513267,
-      longitude: 127.036089,
-    },
-    {
-      id: 4444,
-      category: "제휴샵",
-      markerState: true,
-      latitude: 37.510667,
-      longitude: 127.035089,
-    },
-    // {
-    //   id: 5555,
-    //   category: "와인샵",
-    //   markerState: true,
-    //   latitude: 37.526629,
-    //   longitude: 126.885514,
-    // },
-    // {
-    //   id: 6666,
-    //   category: "할인샵",
-    //   markerState: true,
-    //   latitude: 37.525826,
-    //   longitude: 126.883592,
-    // },
-    // {
-    //   id: 7777,
-    //   category: "레스토랑",
-    //   markerState: true,
-    //   latitude: 37.525649,
-    //   longitude: 126.885067,
-    // },
-    // {
-    //   id: 8888,
-    //   category: "제휴샵",
-    //   markerState: true,
-    //   latitude: 37.527416,
-    //   longitude: 126.884612,
-    // },
-  ]);
 
   // geolocation 이용 현재 위치 확인, 위치 미동의 시 기본 위치로 지정
   useEffect(() => {
+    // const option = {
+    //   enableHighAccuracy: false, // default : false
+    //   maximumAge: 30000,
+    //   timeout: 15000, // default : Infinity
+    // };
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
+      // 사용자가 위치 정보를 허용 한 경우
+      const success = (position: any) => {
         setMyLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
+          allow: true,
         });
-      });
+      };
+      // 사용자가 위치 정보를 허용 하지 않은 경우
+      const error = (e: any) => {
+        console.log("error", e);
+        setMyLocation({
+          latitude: 37.526243,
+          longitude: 126.922734,
+          allow: false,
+        });
+      };
+      navigator.geolocation.getCurrentPosition(success, error /*option*/);
     } else {
-      window.alert("현재 위치를 알 수 없어 기본 위치로 지정합니다.");
-      setMyLocation({ latitude: 37.4862618, longitude: 127.1222903 });
+      window.alert(
+        "현재 브라우저/기기는 현재위치 서비스를 확인 할 수 없어 기본 위치로 지정합니다."
+      );
+      setMyLocation({
+        latitude: 37.526243,
+        longitude: 126.922734,
+        allow: false,
+      });
     }
   }, []);
   // geolocation 이용 현재 위치 확인, 위치 미동의 시 기본 위치로 지정
@@ -180,17 +144,22 @@ function useMap() {
       };
       // 커스텀 마커 현재 위치
 
-      // 현재위치 마커 표시 (2.5초 간격으로 갱신)
-      // setInterval(() => {
-      const myPosition = new naver.maps.Marker({
-        position: new naver.maps.LatLng(currentPosition[0], currentPosition[1]),
-        map: mapRef.current,
-        icon: {
-          content: [currentIcon("")].join(""),
-        },
-      });
-      // }, 2500);
-      // 현재위치 마커 표시 (2.5초 간격으로 갱신)
+      // 현재위치 마커 표시 (현재위치 허용일 경우)
+      if (myLocation.allow) {
+        // setInterval(() => {
+        const myPosition = new naver.maps.Marker({
+          position: new naver.maps.LatLng(
+            currentPosition[0],
+            currentPosition[1]
+          ),
+          map: mapRef.current,
+          icon: {
+            content: [currentIcon("")].join(""),
+          },
+        });
+        // }, 2500);
+      }
+      // 현재위치 마커 표시 (현재위치 허용일 경우)
 
       // zoom 변동시 작동되는 함수
       // naver.maps.Event.addListener(mapRef.current, "zoom_changed", function () {
@@ -207,29 +176,32 @@ function useMap() {
       // drag 변동시 작동되는 함수
 
       // 커스텀 마커
-      // const customIcon = (e: string) => {
-      //   return "<div></div>";
-      // };
+      const customMarker = (e: string) => {
+        return "<div></div>";
+      };
       // 커스텀 마커
 
       // 마커 갯수 테스트용
-      // const bounds = mapRef.current.getBounds(),
-      //   markersLength = 500,
-      //   southWest = bounds.getSW(),
-      //   northEast = bounds.getNE(),
-      //   lngSpan = northEast.lng() - southWest.lng(),
-      //   latSpan = northEast.lat() - southWest.lat();
+      // const makerTest = () => {
+      //   const bounds = mapRef.current.getBounds(),
+      //     markersLength = 500,
+      //     southWest = bounds.getSW(),
+      //     northEast = bounds.getNE(),
+      //     lngSpan = northEast.lng() - southWest.lng(),
+      //     latSpan = northEast.lat() - southWest.lat();
       //
-      // for (let i = 0; i < markersLength; i++) {
-      //   const randomPosition = new naver.maps.LatLng(
-      //     southWest.lat() + latSpan * Math.random(),
-      //     southWest.lng() + lngSpan * Math.random()
-      //   );
-      //   const marker = new naver.maps.Marker({
-      //     position: randomPosition,
-      //     map: mapRef.current,
-      //   });
-      // }
+      //   for (let i = 0; i < markersLength; i++) {
+      //     const randomPosition = new naver.maps.LatLng(
+      //       southWest.lat() + latSpan * Math.random(),
+      //       southWest.lng() + lngSpan * Math.random()
+      //     );
+      //     const marker = new naver.maps.Marker({
+      //       position: randomPosition,
+      //       map: mapRef.current,
+      //     });
+      //   }
+      // };
+      // makerTest();
       // 마커 갯수 테스트용
 
       markers = markers.map((item: { latitude: number; longitude: number }) => {
