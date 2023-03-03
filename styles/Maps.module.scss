@@ -1,0 +1,68 @@
+.mapWrap {
+  position: relative;
+  padding: 10px;
+  width: 100%;
+  height: 100vh;
+  background: #ff5c21;
+  .mapHeader {
+    padding: 5px 10px;
+    ul {
+      display: flex;
+      li {
+        padding: 5px 10px;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        background-color: #ffffff;
+        & + li {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+  .mapMain {
+    width: 100%;
+    height: 95vh;
+  }
+  .mapContent {
+    position: absolute;
+    bottom: 0;
+    width: calc(100% - 20px);
+    height: 50px;
+    background-color: #fff;
+    .listWrap {
+      position: relative;
+      .shopList {
+        > li {
+          padding: 10px;
+          > [class^="Maps_shop"] {
+            & + [class^="Maps_shop"] {
+              margin: 10px 0 0 0;
+            }
+          }
+          .shopThumb {
+            object-fit: contain;
+            img {
+              width: 100%;
+            }
+          }
+          .shopTags {
+            ul {
+              display: flex;
+              > li {
+              }
+            }
+          }
+          .shopName {
+            font-size: 24px;
+          }
+          .shopDetail {
+            font-size: 16px;
+          }
+          .shopLocation {
+            color: #999;
+          }
+        }
+      }
+    }
+  }
+}

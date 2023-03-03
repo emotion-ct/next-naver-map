@@ -112,7 +112,7 @@ function useMap(markers: any) {
         naver.maps.Event.addDOMListener(
           customeControlList.getElement(),
           "click",
-          function (e) {
+          function (e: any) {
             for (let i = 0; i < marker.length; i++) {
               /* todo markerstate 좀더 생각해봐야됨 */
               if (marker[i].category === "와인샵") {
@@ -161,18 +161,46 @@ function useMap(markers: any) {
       }
       // 현재위치 마커 표시 (현재위치 허용일 경우)
 
+      const bounds = mapRef.current.getBounds(),
+        southWest = bounds.getSW(),
+        northEast = bounds.getNE(),
+        lngSpan = northEast.lng() - southWest.lng(),
+        latSpan = northEast.lat() - southWest.lat();
+
       // zoom 변동시 작동되는 함수
-      // naver.maps.Event.addListener(mapRef.current, "zoom_changed", function () {
-      //   console.log("zoom_change");
-      //   // updateMarker(map, markers);
-      // });
+      naver.maps.Event.addListener(mapRef.current, "zoom_changed", function () {
+        console.log("zoom_change");
+        console.log(
+          "남서",
+          northEast.lat(),
+          northEast.lng(),
+          "북동",
+          southWest.lat(),
+          southWest.lng(),
+          "가로넓이",
+          lngSpan * 75000,
+          "세로넓이",
+          latSpan * 75000
+        );
+      });
       // zoom 변동시 작동되는 함수
 
       // drag 변동시 작동되는 함수
-      // naver.maps.Event.addListener(mapRef.current, "dragend", function () {
-      //   console.log("drag");
-      //   // updateMarker(map, markers);
-      // });
+      naver.maps.Event.addListener(mapRef.current, "dragend", function () {
+        console.log("drag");
+        console.log(
+          "남서",
+          northEast.lat(),
+          northEast.lng(),
+          "북동",
+          southWest.lat(),
+          southWest.lng(),
+          "가로넓이",
+          lngSpan * 75000,
+          "세로넓이",
+          latSpan * 75000
+        );
+      });
       // drag 변동시 작동되는 함수
 
       // 커스텀 마커
@@ -287,6 +315,13 @@ function useMap(markers: any) {
             infoWindow.open(mapRef.current, marker);
             // }, 600);
           }
+          // naver.maps.Event.addDOMListener(
+          //   mapRef.current.getElement(),
+          //   "click",
+          //   function () {
+          //     infoWindow.close();
+          //   }
+          // );
         };
       };
 
@@ -294,28 +329,36 @@ function useMap(markers: any) {
         naver.maps.Event.addListener(markers[i], "click", getClickHandler(i));
       }
 
-      updateMarkers(mapRef.current, markers);
+      // updateMarkers(mapRef.current, markers);
     }
   }, [myLocation]);
 
   // geocode 를 통한 위치 검색 > 위도 경도 반환
-  // const [geocodeX, setGeocodeX] = useState("");
-  // const [geocodeY, setGeocodeY] = useState("");
+  const [geocodeX, setGeocodeX] = useState("");
+  const [geocodeY, setGeocodeY] = useState("");
 
-  // useEffect(() => {
-  //   naver.maps.Service.geocode(
-  //     { query: "언주로 637" },
-  //     function (status, response) {
-  //       if (status === naver.maps.Service.Status.ERROR) {
-  //         console.log("fail! status code : " + status);
-  //       } else {
-  //         console.log("Success", response);
-  //         setGeocodeX(response.v2.addresses[0].x);
-  //         setGeocodeY(response.v2.addresses[0].y);
-  //       }
-  //     }
-  //   );
-  // });
+  useEffect(() => {
+    if (typeof myLocation !== "string") {
+      const coordinate =
+        myLocation.longitude.toString() + "," + myLocation.latitude.toString();
+      console.log(coordinate);
+      naver.maps.Service.geocode(
+        {
+          query: "양산로 1길 7",
+          coordinate: coordinate,
+        },
+        function (status, response) {
+          if (status === naver.maps.Service.Status.ERROR) {
+            console.log("fail! status code : " + status);
+          } else {
+            console.log("Success", response);
+            setGeocodeX(response.v2.addresses[0].x);
+            setGeocodeY(response.v2.addresses[0].y);
+          }
+        }
+      );
+    }
+  });
   // geocode 를 통한 위치 검색 > 위도 경도 반환
 
   return {

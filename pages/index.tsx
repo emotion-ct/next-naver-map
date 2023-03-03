@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
-import styled from "styled-components";
 import useMap from "../hooks/useMap";
+import styles from "../styles/Maps.module.scss";
 import { useState } from "react";
 
 const IndexPage: NextPage = () => {
@@ -62,42 +62,63 @@ const IndexPage: NextPage = () => {
     //   longitude: 126.884612,
     // },
   ]);
+  let [shopList, setShopList]: any = useState([
+    {
+      shopThumb: "",
+      shopTags: {
+        discount: true,
+        affiliate: true,
+        corkage: true,
+      },
+      shopName: "",
+      shopDetail: "",
+      shopLocation: "",
+    },
+  ]);
   useMap(markers);
-  const onclickTest = () => {};
+  // const onclickTest = () => {};
   return (
-    <div style={{ padding: "10px", width: "100%", height: "100vh" }}>
-      <div>
+    <div className={styles.mapWrap}>
+      <div className={styles.mapHeader}>
         <ul>
           <li>할인중</li>
           <li>와이넵 제휴</li>
           <li>콜키치</li>
         </ul>
       </div>
-      <MapBox id="map" />
-      <div
-        style={{
-          position: "absolute",
-          bottom: "0",
-          width: "calc(100% - 20px)",
-          background: "#000",
-          height: "100px",
-        }}
-      >
-        <div id={"list"}>
-          <a onClick={onclickTest}>
-            와인샵{[markers.latitude, markers.latitude]}
-          </a>
-        </div>
-      </div>
+      <div id="map" className={styles.mapMain} />
+      {/*<div className={styles.mapContent}>*/}
+      {/*  <div className={styles.listWrap}>*/}
+      {/*    <ul className={styles.shopList}>*/}
+      {/*      <li>*/}
+      {/*        <div className={styles.shopThumb}>*/}
+      {/*          <img src="http://placehold.it/320x100" alt="" />*/}
+      {/*        </div>*/}
+      {/*        <div className={styles.shopTags}>*/}
+      {/*          <ul>*/}
+      {/*            <li>할인중</li>*/}
+      {/*            <li>와이넵 제휴</li>*/}
+      {/*            <li>콜키지</li>*/}
+      {/*          </ul>*/}
+      {/*        </div>*/}
+      {/*        <div className={styles.shopName}>무디티 와인샵</div>*/}
+      {/*        <div className={styles.shopDetail}>*/}
+      {/*          1,500여종의 와인을 보유한 와인 추천 성지*/}
+      {/*        </div>*/}
+      {/*        <div className={styles.shopLocation}>*/}
+      {/*          서울특별시 강남구 학동로 421 지하 1층*/}
+      {/*        </div>*/}
+      {/*      </li>*/}
+      {/*    </ul>*/}
+      {/*  </div>*/}
+      {/*</div>*/}
     </div>
   );
 };
 
 // Styles
-const MapBox = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-`;
+// const MapBox = styled.div``;
+//
+// const appHeader = styled.div``;
 
 export default IndexPage;
