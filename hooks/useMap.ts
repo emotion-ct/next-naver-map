@@ -1,18 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 
-function useMap(markers: any) {
+function useMap(mapState: any) {
   const mapRef = useRef<HTMLElement | null | any>(null);
+  // console.log(mapRef.current.data.controlPositioner);
   const [myLocation, setMyLocation] = useState<
     { latitude: number; longitude: number; allow: boolean } | string
   >("");
 
   // geolocation 이용 현재 위치 확인, 위치 미동의 시 기본 위치로 지정
   useEffect(() => {
-    // const option = {
-    //   enableHighAccuracy: false, // default : false
-    //   maximumAge: 30000,
-    //   timeout: 15000, // default : Infinity
-    // };
+    const option = {
+      enableHighAccuracy: false, // default : false
+      maximumAge: 30000,
+      timeout: 15000, // default : Infinity
+    };
     if (navigator.geolocation) {
       // 사용자가 위치 정보를 허용 한 경우
       const success = (position: any) => {
@@ -31,7 +32,7 @@ function useMap(markers: any) {
           allow: false,
         });
       };
-      navigator.geolocation.getCurrentPosition(success, error /*option*/);
+      navigator.geolocation.getCurrentPosition(success, error, option);
     } else {
       window.alert(
         "현재 브라우저/기기는 현재위치 서비스를 확인 할 수 없어 기본 위치로 지정합니다."
@@ -52,9 +53,9 @@ function useMap(markers: any) {
       // Naver Map 생성
       mapRef.current = new naver.maps.Map("map", {
         center: new naver.maps.LatLng(currentPosition[0], currentPosition[1]),
-        minZoom: 14,
-        maxZoom: 18,
-        scaleControl: false, // 거리 측정
+        minZoom: 14, // 지금 350m
+        maxZoom: 18, // 지름 3km
+        scaleControl: true, // 거리 측정
         logoControl: false,
         mapDataControl: false,
         // zoomControl: true,
@@ -62,7 +63,7 @@ function useMap(markers: any) {
       });
       // Naver Map 생성
 
-      // 현재 위치로 이동시켜주는 버튼
+      // 현재 위치로 이동
       const nowPosition = () => {
         return (
           '<div style="width: 34px; margin: 7px 0 0 7px;' +
@@ -70,19 +71,21 @@ function useMap(markers: any) {
           'background-color: #fff; color: #000;"></div>'
         );
       };
+      // 현재 위치로 이동
 
-      // 클릭 마크 hide
-      const listItem = () => {
-        return (
-          '<div style="width: 60px; margin: 7px 7px 0 0;' +
-          "border: 1px solid #000; background-color: #fff; " +
-          'color: #000; text-align: center;"><div>와인샵</div></div>'
-        );
-      };
+      // 클릭 마크 숨김
+      // const listItem = () => {
+      //   return (
+      //     '<div style="width: 60px; margin: 7px 7px 0 0;' +
+      //     "border: 1px solid #000; background-color: #fff; " +
+      //     'color: #000; text-align: center;"><div>와인샵</div></div>'
+      //   );
+      // };
+      // 클릭 마크 숨김
 
       naver.maps.Event.once(mapRef.current, "init", function () {
-        // 현재 위치로 이동시켜주는 버튼
-        const marker = markers;
+        // 현재 위치로 이동
+        const marker = mapState.markers;
         const customeControlMyLocation = new naver.maps.CustomControl(
           nowPosition(),
           {
@@ -101,31 +104,36 @@ function useMap(markers: any) {
             );
           }
         );
+        // 현재 위치로 이동
 
-        // 클릭 마크 hide
-        const customeControlList = new naver.maps.CustomControl(listItem(), {
-          position: naver.maps.Position.TOP_RIGHT,
-        });
-        customeControlList.setMap(mapRef.current);
+        // 클릭 마크 숨김
+        // const customeControlList = new naver.maps.CustomControl(listItem(), {
+        //   position: naver.maps.Position.TOP_RIGHT,
+        // });
+        // customeControlList.setMap(mapRef.current);
 
         // 예시
-        naver.maps.Event.addDOMListener(
-          customeControlList.getElement(),
-          "click",
-          function (e: any) {
-            for (let i = 0; i < marker.length; i++) {
-              /* todo markerstate 좀더 생각해봐야됨 */
-              if (marker[i].category === "와인샵") {
-                marker[i].markerState = true;
-                marker[i].setMap(mapRef.current, marker);
-              } else {
-                marker[i].markerState = false;
-                marker[i].setMap(null);
-              }
-            }
-          }
-        );
+        // naver.maps.Event.addDOMListener(
+        //   customeControlList.getElement(),
+        //   "click",
+        //   function (e: any) {
+        //     for (let i = 0; i < marker.length; i++) {
+        //       /* todo markerstate 좀더 생각해봐야됨 */
+        //       if (marker[i].category === "discount") {
+        //         marker[i].markerState = true;
+        //         marker[i].setMap(mapRef.current, marker);
+        //       } else if (marker[i].category === "와이넵 제휴") {
+        //         marker[i].markerState = true;
+        //         marker[i].setMap(mapRef.current, marker);
+        //       } else {
+        //         marker[i].markerState = false;
+        //         marker[i].setMap(null);
+        //       }
+        //     }
+        //   }
+        // );
       });
+      // 클릭 마크 숨김
 
       // 커스텀 마커 현재 위치
       const currentIcon = (e: string) => {
@@ -168,39 +176,39 @@ function useMap(markers: any) {
         latSpan = northEast.lat() - southWest.lat();
 
       // zoom 변동시 작동되는 함수
-      naver.maps.Event.addListener(mapRef.current, "zoom_changed", function () {
-        console.log("zoom_change");
-        console.log(
-          "남서",
-          northEast.lat(),
-          northEast.lng(),
-          "북동",
-          southWest.lat(),
-          southWest.lng(),
-          "가로넓이",
-          lngSpan * 75000,
-          "세로넓이",
-          latSpan * 75000
-        );
-      });
+      // naver.maps.Event.addListener(mapRef.current, "zoom_changed", function () {
+      //   console.log("zoom_change");
+      //   console.log(
+      //     "남서",
+      //     northEast.lat(),
+      //     northEast.lng(),
+      //     "북동",
+      //     southWest.lat(),
+      //     southWest.lng(),
+      //     "가로넓이",
+      //     lngSpan * 75000,
+      //     "세로넓이",
+      //     latSpan * 75000
+      //   );
+      // });
       // zoom 변동시 작동되는 함수
 
       // drag 변동시 작동되는 함수
-      naver.maps.Event.addListener(mapRef.current, "dragend", function () {
-        console.log("drag");
-        console.log(
-          "남서",
-          northEast.lat(),
-          northEast.lng(),
-          "북동",
-          southWest.lat(),
-          southWest.lng(),
-          "가로넓이",
-          lngSpan * 75000,
-          "세로넓이",
-          latSpan * 75000
-        );
-      });
+      // naver.maps.Event.addListener(mapRef.current, "dragend", function () {
+      //   console.log("drag");
+      //   console.log(
+      //     "남서",
+      //     northEast.lat(),
+      //     northEast.lng(),
+      //     "북동",
+      //     southWest.lat(),
+      //     southWest.lng(),
+      //     "가로넓이",
+      //     lngSpan * 75000,
+      //     "세로넓이",
+      //     latSpan * 75000
+      //   );
+      // });
       // drag 변동시 작동되는 함수
 
       // 커스텀 마커
@@ -232,32 +240,41 @@ function useMap(markers: any) {
       // makerTest();
       // 마커 갯수 테스트용
 
-      markers = markers.map((item: { latitude: number; longitude: number }) => {
-        let markerPosition = new naver.maps.LatLng(
-          item.latitude,
-          item.longitude
-        );
-        return new naver.maps.Marker({
-          ...item,
-          map: mapRef.current,
-          position: markerPosition,
-          // animation: naver.maps.Animation.DROP,
-          // icon: {
-          //   content: [customIcon("")].join(""),
-          //   size: new naver.maps.Size(38, 58),
-          //   anchor: new naver.maps.Point(19, 58),
-          // },
-          // });
-        });
-      });
+      // 마커 생성
+      mapState.markers = mapState.markers.map(
+        (item: {
+          latitude: number;
+          longitude: number;
+          markerState: boolean;
+        }) => {
+          let markerPosition = new naver.maps.LatLng(
+            item.latitude,
+            item.longitude
+          );
+          return new naver.maps.Marker({
+            ...item,
+            map: mapRef.current,
+            position: markerPosition,
+            visible: item.markerState,
+            // animation: naver.maps.Animation.DROP,
+            // icon: {
+            //   content: [customIcon("")].join(""),
+            //   size: new naver.maps.Size(38, 58),
+            //   anchor: new naver.maps.Point(19, 58),
+            // },
+            // });
+          });
+        }
+      );
+      // 마커 생성
 
       // 마커 인포창
       let infoWindows: any = [];
-      for (let i = 0; i < markers.length; i++) {
+      for (let i = 0; i < mapState.markers.length; i++) {
         const infoContent = [
           "<div style='background-color: #000; color: white; padding: 10px 10px 8px;'>" +
-            markers[i].id +
-            markers[i].category +
+            mapState.markers[i].id +
+            mapState.markers[i].category +
             "</div>",
         ].join("");
         const infoWindow = new naver.maps.InfoWindow({
@@ -267,11 +284,10 @@ function useMap(markers: any) {
         infoWindows.push(infoWindow);
       }
       naver.maps.Event.addListener(mapRef.current, "idle", function () {
-        updateMarkers(mapRef.current, markers);
+        updateMarkers(mapRef.current, mapState.markers);
       });
       // 마커 인포창
 
-      // 마커 추가
       const updateMarkers = function (map: any, markers: any) {
         let mapBounds = mapRef.current.getBounds();
         let marker, position, markerState;
@@ -286,7 +302,6 @@ function useMap(markers: any) {
           }
         }
       };
-      // 마커 인포창
 
       const showMarker = (map: any, marker: any) => {
         if (marker.getMap()) return;
@@ -300,11 +315,11 @@ function useMap(markers: any) {
 
       const getClickHandler = (seq: any) => {
         return function (e: any) {
-          const marker = markers[seq],
+          const marker = mapState.markers[seq],
             infoWindow = infoWindows[seq],
             markerPosition = new naver.maps.LatLng(
-              markers[seq].latitude,
-              markers[seq].longitude
+              mapState.markers[seq].latitude,
+              mapState.markers[seq].longitude
             );
           if (infoWindow.getMap()) {
             infoWindow.close();
@@ -325,8 +340,12 @@ function useMap(markers: any) {
         };
       };
 
-      for (let i = 0, ii = markers.length; i < ii; i++) {
-        naver.maps.Event.addListener(markers[i], "click", getClickHandler(i));
+      for (let i = 0, ii = mapState.markers.length; i < ii; i++) {
+        naver.maps.Event.addListener(
+          mapState.markers[i],
+          "click",
+          getClickHandler(i)
+        );
       }
 
       // updateMarkers(mapRef.current, markers);
@@ -334,31 +353,31 @@ function useMap(markers: any) {
   }, [myLocation]);
 
   // geocode 를 통한 위치 검색 > 위도 경도 반환
-  const [geocodeX, setGeocodeX] = useState("");
-  const [geocodeY, setGeocodeY] = useState("");
-
-  useEffect(() => {
-    if (typeof myLocation !== "string") {
-      const coordinate =
-        myLocation.longitude.toString() + "," + myLocation.latitude.toString();
-      console.log(coordinate);
-      naver.maps.Service.geocode(
-        {
-          query: "양산로 1길 7",
-          coordinate: coordinate,
-        },
-        function (status, response) {
-          if (status === naver.maps.Service.Status.ERROR) {
-            console.log("fail! status code : " + status);
-          } else {
-            console.log("Success", response);
-            setGeocodeX(response.v2.addresses[0].x);
-            setGeocodeY(response.v2.addresses[0].y);
-          }
-        }
-      );
-    }
-  });
+  // const [geocodeX, setGeocodeX] = useState("");
+  // const [geocodeY, setGeocodeY] = useState("");
+  //
+  // useEffect(() => {
+  //   if (typeof myLocation !== "string") {
+  //     const coordinate =
+  //       myLocation.longitude.toString() + "," + myLocation.latitude.toString();
+  //     console.log(coordinate);
+  //     naver.maps.Service.geocode(
+  //       {
+  //         query: "언주로 637",
+  //         coordinate: coordinate,
+  //       },
+  //       function (status, response) {
+  //         if (status === naver.maps.Service.Status.ERROR) {
+  //           console.log("fail! status code : " + status);
+  //         } else {
+  //           console.log("Success", response);
+  //           setGeocodeX(response.v2.addresses[0].x);
+  //           setGeocodeY(response.v2.addresses[0].y);
+  //         }
+  //       }
+  //     );
+  //   }
+  // });
   // geocode 를 통한 위치 검색 > 위도 경도 반환
 
   return {
