@@ -85,7 +85,6 @@ function useMap(mapState: any) {
 
       naver.maps.Event.once(mapRef.current, "init", function () {
         // 현재 위치로 이동
-        const marker = mapState.markers;
         const customeControlMyLocation = new naver.maps.CustomControl(
           nowPosition(),
           {
